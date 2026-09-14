@@ -1,4 +1,6 @@
+
 """비즈니스 로직 계층 — 저장소를 조합해 실제 기능을 구현한다."""
+import heapq
 from typing import Iterator, Optional
 
 from .models import Transaction
@@ -44,17 +46,16 @@ class TransactionService:
         self.tx_repo.append(tx)
         return tx
 
-import heapq
+    def list_recent(self, limit: int = 10) -> list[Transaction]:
+        """전체를 리스트로 모으지 않고 heapq로 상위 N개(최신순)만 유지한다."""
+        return heapq.nlargest(
+            limit,
+            self.tx_repo.stream_all(),
+            key=lambda t: (t.date, t.id),
+        )
 
-def list_recent(self, limit: int = 10) -> list[Transaction]:
-    return heapq.nlargest(
-        limit,
-        self.tx_repo.stream_all(),
-        key=lambda t: (t.date, t.id)
-    )
-
-def search(
-    self,
+    def search(
+        self,
         date_from: Optional[str] = None,
         date_to: Optional[str] = None,
         category: Optional[str] = None,
