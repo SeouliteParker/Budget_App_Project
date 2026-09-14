@@ -1,3 +1,4 @@
+
 """CLI 계층 — 인자 파싱, 대화형 입력, 출력 포맷팅을 담당한다."""
 import argparse
 import csv
@@ -57,6 +58,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_bset = budget_sub.add_parser("set", help="예산 설정")
     p_bset.add_argument("--month", required=True)
     p_bset.add_argument("--amount", type=int, required=True)
+    p_bget = budget_sub.add_parser("get", help="예산 조회")
+    p_bget.add_argument("--month", required=True)
 
     p_cat = sub.add_parser("category", help="카테고리를 관리한다")
     cat_sub = p_cat.add_subparsers(dest="cat_cmd", required=True)
@@ -245,6 +248,18 @@ def cmd_budget_set(args, budget_service: BudgetService):
 @handle_errors
 @log_execution
 @measure_time
+def cmd_budget_get(args, budget_service: BudgetService):
+    validate_month(args.month)
+    amount = budget_service.budget_repo.get(args.month)
+    if amount is None:
+        print(f"[안내] {args.month} 예산이 설정되어 있지 않습니다.")
+    else:
+        print(f"{args.month} 예산: {amount}원")
+
+
+@handle_errors
+@log_execution
+@measure_time
 def cmd_category(args, cat_service: CategoryService):
     if args.cat_cmd == "list":
         names = cat_service.list_names()
@@ -331,6 +346,8 @@ def dispatch(args, tx_service, budget_service, cat_service):
     elif args.command == "budget":
         if args.budget_cmd == "set":
             cmd_budget_set(args, budget_service)
+        elif args.budget_cmd == "get":
+            cmd_budget_get(args, budget_service)
     elif args.command == "category":
         cmd_category(args, cat_service)
     elif args.command == "export":

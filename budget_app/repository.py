@@ -50,9 +50,15 @@ class TransactionRepository:
         with open(self.filepath, "a", encoding="utf-8") as f:
             f.write(json.dumps(tx.to_dict(), ensure_ascii=False) + "\n")
 
-    def next_id(self) -> str:
-        count = sum(1 for _ in self.stream_all())
-        return f"TX-{count + 1:06d}"
+        def next_id(self) -> str:
+        max_num = 0
+        for tx in self.stream_all():
+            try:
+                num = int(tx.id.split("-")[-1])
+                max_num = max(max_num, num)
+            except (ValueError, IndexError):
+                continue
+        return f"TX-{max_num + 1:06d}"
 
     def rewrite_all(self, transactions: list[Transaction]) -> None:
         lines = [json.dumps(t.to_dict(), ensure_ascii=False) for t in transactions]
