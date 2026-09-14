@@ -50,7 +50,7 @@ class TransactionRepository:
         with open(self.filepath, "a", encoding="utf-8") as f:
             f.write(json.dumps(tx.to_dict(), ensure_ascii=False) + "\n")
 
-        def next_id(self) -> str:
+    def next_id(self) -> str:
         max_num = 0
         for tx in self.stream_all():
             try:
