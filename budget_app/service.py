@@ -44,14 +44,17 @@ class TransactionService:
         self.tx_repo.append(tx)
         return tx
 
-    def list_recent(self, limit: int = 10) -> list[Transaction]:
-        """최신순 정렬은 전체 순회가 불가피하므로 스트리밍 후 정렬한다."""
-        all_tx = list(self.tx_repo.stream_all())
-        all_tx.sort(key=lambda t: (t.date, t.id), reverse=True)
-        return all_tx[:limit]
+import heapq
 
-    def search(
-        self,
+def list_recent(self, limit: int = 10) -> list[Transaction]:
+    return heapq.nlargest(
+        limit,
+        self.tx_repo.stream_all(),
+        key=lambda t: (t.date, t.id)
+    )
+
+def search(
+    self,
         date_from: Optional[str] = None,
         date_to: Optional[str] = None,
         category: Optional[str] = None,
