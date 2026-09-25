@@ -1,0 +1,4 @@
+date,type,category,amount,memo,tags
+2026-09-20,expense,food,15000,점심식사,"식사,점심"
+2026-09-21,expense,transport,3500,지하철,"교통,출근"
+2026-09-25,income,etc,3000000,9월급여,급여
